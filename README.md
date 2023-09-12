@@ -1,11 +1,13 @@
-# flux-tf-state-unlocker
+# flux-missing-certificate
 
-Unlock the Terraform state that the Flux Terraform controller tries to use.
+Restart the terraform controller when the secret for the runners is missing.
 
 ## Problem
 
-When running Terraform code to control the Kubernetes cluster that the Flux Terraform controller is running on, it can happen that the Runner is terminated. This happens among others when the node that the Runner runs on, is upgraded, and the node is evacuated. The Runner is then moved to a different node, but the Terraform run is stopped without freeing up the Terraform lock.
+When you try to delete the flux-system namespace, mess up, and recreate it, you could end up with two namespaces namef flux-system in etcd.
+This problem is tracked in [this issue](https://github.com/weaveworks/tf-controller/issues/372).
+The workaround is to restart the Terraform Controller.
 
 ## Solution
 
-The script looks at the state of a Terraform resource of the Terraform controller. When a certain condition exists, the script patches the Terraform resource definition to automatically unlock the Terraform state at the start of the run.
+The script looks if the secret is present. If it is missing, the Terraform Controller is restarted, or stated differently: the pod is deleted and the stateful set will create a new one.
