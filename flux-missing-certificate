@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -x
+
+NAMESPACE="${NAMESPACE:-flux-system}"
+
+# Look for certificate
+SECRET_EXISTS=$(kubectl get secrets -n "${NAMESPACE}" -l infra.contrib.fluxcd.io/terraform=true -o NAME | grep terraform-runner.tls)
+
+if [ -n "${SECRET_EXISTS}" ]
+then
+  # Secret for tls exists, nothing to do
+  exit 0
+fi
+
+# Secret doesn't exist, workaround is to restart tf-controller pod
+
+TF_POD=$(kubectl get pods -n "${NAMESPACE}" -l app.kubernetes.io/instance=tf-controller -l app.kubernetes.io/name=tf-controller -o name)
+
+if [ -z "${TF_POD}" ]
+then
+  # Pod not found, then we do nothing
+  exit 0
+fi
+
+kubectl delete "${TF_POD}" -n "${NAMESPACE}"
