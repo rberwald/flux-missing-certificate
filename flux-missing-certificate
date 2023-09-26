@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -x
+exec 2>&1
 
 NAMESPACE="${NAMESPACE:-flux-system}"
 
