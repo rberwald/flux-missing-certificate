@@ -22,7 +22,7 @@ env:
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
-  KUBERNETES_VERSION: v1.27
+  KUBERNETES_VERSION: v1.31
 
 jobs:
   publish:
